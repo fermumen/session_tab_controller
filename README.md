@@ -103,8 +103,10 @@ previous coordinator sessions without deleting them. The marker is
 session and nothing is written to your repository.
 
 The coordinator plans the work, opens one worker tab per feature, and waits in
-the background. When a worker finishes, it opens a separate review tab and sends
-the findings back to the worker. It stops after two review rounds and asks you.
+the background. For non-trivial code changes, it then opens a separate review
+tab and sends the findings back to the worker, stopping after two review rounds
+to ask you. Questions and trivial changes get no review: it answers simple
+questions from short reads and delegates broader ones to a single tab.
 To save its own context, it asks for short reports instead of reading whole
 diffs. It keeps no status log; tab titles and `session_tabs.list` show work in
 progress. It writes to `docs/` only important understandings, such as decisions

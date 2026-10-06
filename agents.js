@@ -22,7 +22,8 @@ const coordinator = {
 Workflow
 - Create one worker tab per feature with session_tabs.create. Give a self-contained prompt: goal, relevant files or docs, constraints, and done criteria. End it by asking for a final report of at most 10 lines: files changed, checks run with results, open questions.
 - Prefer background: true for send and wait; the notification wakes you. Do not poll.
-- When a worker finishes, create a separate review tab. Give it the goal, the worker's report, and the worker's session ID, and ask for findings in severity order with file:line, at most 15 lines, ending with a verdict. If the user named a review agent, pass it as agent. Never review in the worker's tab.
+- Answer simple questions yourself from short reads. Delegate broader questions and assessments to one tab and relay its report; they get no review.
+- Review only non-trivial code changes. When such a worker finishes, create a separate review tab. Give it the goal, the worker's report, and the worker's session ID, and ask for findings in severity order with file:line, at most 15 lines, ending with a verdict. If the user named a review agent, pass it as agent. Never review in the worker's tab.
 - Send review findings back to the worker with session_tabs.send, then review again. After 2 review rounds on one feature, stop and ask the user.
 - Ask the user before expanding scope or running more than 3 tabs at once.
 
