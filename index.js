@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process"
 import { setTimeout } from "node:timers/promises"
 import { SessionTabs, createInput } from "./rpc.js"
+import { addAgents } from "./agents.js"
 
 // Plugin.define is an identity helper; the plain definition avoids SDK resolution.
 export default {
@@ -132,6 +133,7 @@ export default {
           title: input.title,
           location: { directory: ctx.location.directory },
           ...(input.model ? { model: input.model } : {}),
+          ...(input.agent ? { agent: input.agent } : {}),
         })
 
         // Live UI event: no listener means the session still exists, but no tab opens.
@@ -156,13 +158,15 @@ export default {
       },
     })
 
+    await ctx.agent.transform(addAgents)
+
     const tabs = ctx.rpc(SessionTabs)
     await ctx.tool.transform((editor) => {
       editor.namespace({ name: "session_tabs", description: "Create and list sessions, send prompts, and wait in foreground/background; request TUI tabs." })
       editor.add({
         name: "create",
         description:
-          "Create an independent session in the current folder and request a background tab in matching OpenCode terminals, without stealing focus. Optionally select a model and send a first prompt. tabRequested is not a UI acknowledgement; a connected TUI with this plugin and tabs enabled is required. Use only when the user asks to create a session.",
+          "Create an independent session in the current folder and request a background tab in matching OpenCode terminals, without stealing focus. Optionally select a model or agent and send a first prompt. tabRequested is not a UI acknowledgement; a connected TUI with this plugin and tabs enabled is required. Use only when the user asks to create a session.",
         input: createInput,
         options: { namespace: "session_tabs", codemode: true },
         execute: async (input, context) => ({ content: JSON.stringify(await tabs.create(input, { signal: context.signal })) }),

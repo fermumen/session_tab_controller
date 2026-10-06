@@ -13,6 +13,7 @@ export const createInput = {
       required: ["providerID", "id"],
       additionalProperties: false,
     },
+    agent: { type: "string", minLength: 1, description: "Optional agent ID for the new session; omission uses the default agent." },
   },
   required: ["title"],
   additionalProperties: false,

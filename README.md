@@ -6,16 +6,16 @@ It is deliberately a small toy, not a production job scheduler.
 
 ## Install
 
-Requires OpenCode V2 (developed against 2.0.22) and the local managed service.
-
 ```sh
 opencode plugin add github:fermumen/session_tab_controller
 ```
 
-The package includes both server and TUI entrypoints. No separate CLI plugin
-configuration or build step is needed. Reopen the TUI if it does not reload.
+Requires OpenCode V2 (developed against 2.0.22) with the local managed service.
+Reopen the TUI, then run `/co` to open the coordinator.
 
-For local development, clone this repository and add its absolute directory to
+## Local development
+
+Clone this repository and add its absolute directory to
 the global `plugins` array in `~/.config/opencode/opencode.json`, preserving other
 settings:
 
@@ -36,8 +36,9 @@ objects unchanged).
 
 Adds the `session_tabs.create`, `session_tabs.list`, `session_tabs.send`, and `session_tabs.wait`
 Code Mode tools (effective names use underscores, e.g. `session_tabs_create`).
-It accepts `title`, optional `prompt`, and optional `model` containing `providerID`,
-`id`, and `variant`. Without a model, OpenCode uses its normal default.
+It accepts `title`, optional `prompt`, optional `model` containing `providerID`,
+`id`, and `variant`, and optional `agent` (an agent ID).
+Without a model or agent, OpenCode uses its normal defaults.
 
 The server creates a root session at the invoking plugin's location, broadcasts
 an RPC event, and optionally submits the first prompt. The TUI syncs the session
@@ -89,6 +90,47 @@ await tools.session_tabs.wait({ sessionID: "ses_...", timeoutSeconds: 1 })
 await tools.session_tabs.wait({ sessionID: "ses_...", background: true })
 ```
 
+## Coordinator
+
+The plugin registers a primary `coordinator` agent and a `/coordinator` command
+(alias `/co`, also in the command palette).
+
+`/co` focuses this folder's coordinator tab and moves it to the front. If several
+sessions are marked, it uses the most recently active one. If there is none, it
+asks whether to create one. `/co new` creates a replacement and unmarks the
+previous coordinator sessions without deleting them. The marker is
+`sessionTabsCoordinator: true` in session metadata, so it travels with the
+session and nothing is written to your repository.
+
+The coordinator plans the work, opens one worker tab per feature, and waits in
+the background. When a worker finishes, it opens a separate review tab and sends
+the findings back to the worker. It stops after two review rounds and asks you.
+To save its own context, it asks for short reports and keeps durable state in
+`docs/coordinator.md` instead of reading whole diffs, so a replacement
+coordinator can pick up from that file.
+
+It can use the `session_tabs` tools, read and search files in the workspace, ask
+questions, and edit only under `docs/`. Shell, subagents, web tools, and reading
+OpenCode's saved full tool output are denied. It is not sandboxed:
+
+- The `session_tabs` tools run in Code Mode, so the coordinator needs `execute`,
+  and Code Mode provides an unrestricted `fetch`. The coordinator has network
+  access, including to URLs it reads in other sessions' replies.
+- OpenCode appends your global `permissions` after the plugin's rules, and the
+  last matching rule wins, so global rules can re-enable denied actions. To
+  change only the coordinator, add rules to the `coordinator` agent in your
+  configuration instead; its settings override the plugin's, and its permission
+  rules apply last.
+- Its restrictions limit what it does itself, not what it asks other tabs to do.
+
+Worker and review tabs use your default agent with its normal permissions. The
+plugin does not ship a review agent. To restrict review tabs, define your own
+agent (for example one that denies `edit`) and tell the coordinator its ID; it
+passes that as `agent` when creating review tabs. OpenCode does not check the ID
+when creating a session, so an unknown agent fails only when the tab starts
+running. Set a cheaper model for the coordinator with the model picker, or with
+the `model` field on the `coordinator` agent in your configuration.
+
 ## Try it
 
 Ask an agent: "Create a tab called Hello using openai/gpt-6-luna low, and send
@@ -124,6 +166,17 @@ service is not normally necessary.
 - Repeated background observations can generate duplicate notifications.
 - Root sessions do not inherit the caller's session-specific restrictions: this
   is independent session control, not sandboxed/read-only subagent delegation.
+  Pass `agent` to give a tab a restricted agent that you define.
+- Background notifications include the full reply text, so long replies still
+  enter the coordinator's context. Its prompts ask workers for short reports.
+- Several sessions can carry the coordinator marker: forks inherit metadata, and
+  two TUIs can create one at the same time. `/co` uses the most recently active
+  one, so a recently used fork can take over. It warns about the rest and leaves
+  them unchanged; `/co new` unmarks all of them.
+- `/co` pages through this folder's root sessions. A coordinator updated while
+  it pages past the first 200 can be missed; run `/co` again.
+- The coordinator tab is moved to the front when `/co` runs, not kept there
+  continuously.
 - Cancellation/partial failure during creation can leave a created session behind.
 
 ## Tests

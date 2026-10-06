@@ -13,8 +13,9 @@ clear change. Do not expand scope to address hypothetical future needs.
 ## Repository map
 
 - `index.js`: server plugin; session tools, prompt observation, background notifications.
+- `agents.js`: `coordinator` agent prompt and permissions.
 - `rpc.js`: shared create-input schema, RPC method, and tab-opening event contract.
-- `tui.js`: client plugin; folder filtering, session synchronization, background tabs.
+- `tui.js`: client plugin; folder filtering, session synchronization, background tabs, `/coordinator`.
 - `plugin.test.js`: existing Bun tests for the TUI event handler.
 - `package.json`: ES module package with server and TUI exports; no build step.
 
@@ -48,6 +49,7 @@ Run relevant checks for code changes:
 ```sh
 node --check index.js
 node --check rpc.js
+node --check agents.js
 node --check tui.js
 bun test
 git diff --check

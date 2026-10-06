@@ -41,6 +41,7 @@ function client({ directory = "/repo", enabled = true, syncError, opens = true, 
       },
       toast: { show: (toast) => toasts.push(toast) },
     },
+    keymap: { layer() {} },
   })
 
   return {
