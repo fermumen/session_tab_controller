@@ -12,6 +12,8 @@ opencode plugin add github:fermumen/session_tab_controller
 
 Requires OpenCode V2 (developed against 2.0.22) with the local managed service.
 Reopen the TUI, then run `/co` to open the coordinator.
+The command registers inside an `app` UI slot to avoid the
+`Keymap.Provider is missing` setup error in OpenCode 2.0.22.
 
 ## Local development
 

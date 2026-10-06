@@ -90,22 +90,32 @@ export default {
       await show(session.id)
     }
 
-    context.keymap.layer(() => ({
-      mode: "global",
-      commands: [{
-        id: "session-tabs.coordinator",
-        title: "Open coordinator",
-        description: "Focus this folder's coordinator tab, or create one. Pass new to replace it.",
-        group: "Session Tabs",
-        palette: true,
-        slash: { name: "coordinator", aliases: ["co"], arguments: true },
-        run: (input) => coordinator(input).catch((error) => {
-          context.ui.toast.show({ message: `Coordinator failed: ${String(error)}`, variant: "error" })
-        }),
-      }],
-    }))
+    // OpenCode 2.0.22 needs the slot's UI provider context to register keymaps.
+    const stopSlot = context.ui.slot({
+      append: "app",
+      render: () => {
+        context.keymap.layer(() => ({
+          mode: "global",
+          commands: [{
+            id: "session-tabs.coordinator",
+            title: "Open coordinator",
+            description: "Focus this folder's coordinator tab, or create one. Pass new to replace it.",
+            group: "Session Tabs",
+            palette: true,
+            slash: { name: "coordinator", aliases: ["co"], arguments: true },
+            run: (input) => coordinator(input).catch((error) => {
+              context.ui.toast.show({ message: `Coordinator failed: ${String(error)}`, variant: "error" })
+            }),
+          }],
+        }))
+        return null
+      },
+    })
 
     context.ui.toast.show({ message: "Session Tabs toy plugin loaded", variant: "success" })
-    return stop
+    return () => {
+      stopSlot()
+      stop()
+    }
   },
 }

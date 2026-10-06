@@ -31,6 +31,11 @@ function client({ directory = "/repo", enabled = true, syncError, opens = true, 
       },
     },
     ui: {
+      slot: ({ append, render }) => {
+        expect(append).toBe("app")
+        expect(render()).toBeNull()
+        return () => {}
+      },
       tabs: {
         enabled: () => enabled,
         open: (sessionID) => {
