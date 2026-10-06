@@ -6,7 +6,7 @@ import { SessionTabs } from "./rpc.js"
 const marker = "sessionTabsCoordinator"
 
 export default {
-  id: "toy.session-tabs.ui",
+  id: "session-tabs.ui",
   setup(context) {
     const tabs = context.client.rpc(SessionTabs)
     const stop = tabs.events.on("open", (event) => {

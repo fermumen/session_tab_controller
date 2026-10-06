@@ -21,7 +21,7 @@ export const createInput = {
 
 // Portable RPC definitions are plain objects with JSON schemas.
 export const SessionTabs = {
-  id: "toy.session-tabs",
+  id: "session-tabs",
   methods: {
     create: {
       input: createInput,

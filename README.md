@@ -139,7 +139,7 @@ Hello. Do not modify files in that session."
 For a direct test from this folder:
 
 ```sh
-opencode api post /api/rpc/toy.session-tabs/create --data '{"input":{"title":"Toy tab test"}}'
+opencode api post /api/rpc/session-tabs/create --data '{"input":{"title":"Toy tab test"}}'
 ```
 
 Existing clients should reload the plugin automatically. If there is no

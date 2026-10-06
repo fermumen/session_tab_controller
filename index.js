@@ -5,7 +5,7 @@ import { addAgents } from "./agents.js"
 
 // Plugin.define is an identity helper; the plain definition avoids SDK resolution.
 export default {
-  id: "toy.session-tabs",
+  id: "session-tabs",
   async setup(ctx) {
     const backgroundWaits = new Set()
     const sending = new Set()
