@@ -12,8 +12,6 @@ opencode plugin add github:fermumen/session_tab_controller
 
 Requires OpenCode V2 (developed against 2.0.22) with the local managed service.
 Reopen the TUI, then run `/co` to open the coordinator.
-The command registers inside an `app` UI slot to avoid the
-`Keymap.Provider is missing` setup error in OpenCode 2.0.22.
 
 ## Local development
 
@@ -107,9 +105,10 @@ session and nothing is written to your repository.
 The coordinator plans the work, opens one worker tab per feature, and waits in
 the background. When a worker finishes, it opens a separate review tab and sends
 the findings back to the worker. It stops after two review rounds and asks you.
-To save its own context, it asks for short reports and keeps durable state in
-`docs/coordinator.md` instead of reading whole diffs, so a replacement
-coordinator can pick up from that file.
+To save its own context, it asks for short reports instead of reading whole
+diffs. It keeps no status log; tab titles and `session_tabs.list` show work in
+progress. It writes to `docs/` only important understandings, such as decisions
+and non-obvious constraints, and most tasks add nothing.
 
 It can use the `session_tabs` tools, read and search files in the workspace, ask
 questions, and edit only under `docs/`. Shell, subagents, web tools, and reading

@@ -90,7 +90,8 @@ export default {
       await show(session.id)
     }
 
-    // OpenCode 2.0.22 needs the slot's UI provider context to register keymaps.
+    // Registering from setup failed with "Keymap.Provider is missing" (seen in 2.0.22 and 2.0.24);
+    // the app slot runs inside the UI providers.
     const stopSlot = context.ui.slot({
       append: "app",
       render: () => {
